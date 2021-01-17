@@ -15,7 +15,7 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle("Notes Demo Project")
     .setDescription(
-      "A documentation for notes"
+      "By : taha nebti"
     )
     .setVersion("1.0")
     .addTag("Notes")

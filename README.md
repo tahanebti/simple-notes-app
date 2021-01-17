@@ -8,3 +8,7 @@ A basic application built to organize study notes.  Utilizes markdown syntax to 
 Backend : Nestjs , Jwt Auth , Swagger , dto / mapper , class-validation , bcrypt ... 
 Frontend : Angular nonorepo architectur, NgRx to handle state management
 Persistence : TypeOrm + mySQL
+
+### Screenshots
+
+![Swagger Doc](https://ibb.co/BZ5p322)
