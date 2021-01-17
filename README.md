@@ -11,4 +11,4 @@ Persistence : TypeOrm + mySQL
 
 ### Screenshots
 
-![Swagger Doc](https://ibb.co/BZ5p322)
+![Swagger Doc](https://i.ibb.co/6P7Mw00/mynote.png)
