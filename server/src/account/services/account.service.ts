@@ -15,6 +15,9 @@ import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateProfileDto } from '../dtos/create-profile.dto';
 import { CreateAddressDto } from '../dtos/create-address.dto';
+import { UpdateAccountDto } from '../dtos/update-account.dto';
+import { AccountNotFoundException } from '../exceptions/account-not-found.exception';
+import { UpdateProfileDto } from '../dtos/update-profile.dto';
 
 @Injectable()
 export class AccountService {
@@ -26,11 +29,45 @@ export class AccountService {
         @InjectRepository(User) private readonly _userRepository: Repository<User>,
     ){}
 
+    public async getAccountDetails(accountId: number): Promise<Partial<Account>> {
+      const account: Account = await this._accountRepository.findOne({
+        relations: ['plan'],
+        where: { id: accountId }
+      });
+      const { comfirmationToken, ...result } = account;
+      return result;
+    }
+
+    public async updateAccountDetails(accountId: number, updateAccountDto: UpdateAccountDto): Promise<Account> {
+      const account: Account = await this._accountRepository.findOne(accountId);
+      if (!account) throw new AccountNotFoundException();
+      account.plan = updateAccountDto.plan;
+      const { comfirmationToken, ...result } = await this._accountRepository.save(account);
+      return result as Account;
+    }
+
     public async getAccountProfile(accountId: number): Promise<Profile> {
         return this._profileRepository.findOne({
           relations: ['address'],
           where: { account: { id: accountId } }
         });
+    }
+
+    public async updateAccountProfile(accountId: number, updateProfileDto: UpdateProfileDto): Promise<Profile> {
+      const profile: Profile = await this._profileRepository.findOne({ 
+        relations: ['address'],
+        where: { account: { id: accountId } }
+      });
+      profile.firstName = updateProfileDto.firstName;
+      profile.lastName = updateProfileDto.lastName;
+      profile.address.street = updateProfileDto.address.street;
+      profile.address.street2 = updateProfileDto.address.street2;
+      profile.address.city = updateProfileDto.address.city ;
+      profile.address.state = updateProfileDto.address.state;
+      profile.address.zip = updateProfileDto.address.zip;
+      this._profileRepository.save(profile);
+      this._addressRepository.save(profile.address);
+      return profile;
     }
 
 
@@ -97,5 +134,8 @@ export class AccountService {
         });
         return this._addressRepository.save(address);
       }
+
+
+      
 
 }

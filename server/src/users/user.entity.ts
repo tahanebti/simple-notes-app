@@ -1,6 +1,7 @@
 import { Account } from 'src/account/entities/account.entity';
+import { RefreshToken } from 'src/auth/entities/refresh-token.entity';
 import { BaseEntity } from 'src/database/base.entity';
-import { Entity, Column, PrimaryGeneratedColumn, Generated, ManyToMany, JoinTable, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Generated, ManyToMany, JoinTable, OneToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Role } from './role.entity';
 
 @Entity()
@@ -30,5 +31,7 @@ export class User extends BaseEntity  {
   @JoinColumn({ name: 'account_id' })
   public account: Account;
 
+  @OneToMany(type => RefreshToken, token => token.id)
+  public refreshTokens: RefreshToken[];
 
 }
