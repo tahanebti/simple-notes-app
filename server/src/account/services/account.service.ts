@@ -18,6 +18,8 @@ import { CreateAddressDto } from '../dtos/create-address.dto';
 import { UpdateAccountDto } from '../dtos/update-account.dto';
 import { AccountNotFoundException } from '../exceptions/account-not-found.exception';
 import { UpdateProfileDto } from '../dtos/update-profile.dto';
+import { ResponseStatus } from 'src/core/enums/response-status.enum';
+import { ResponseMessage } from 'src/core/models/response-message.model';
 
 @Injectable()
 export class AccountService {
@@ -134,6 +136,38 @@ export class AccountService {
         });
         return this._addressRepository.save(address);
       }
+
+
+      public async passwordRequestReset(email: string): Promise<ResponseMessage> {
+        const profile: Profile = await this._profileRepository.findOne({ 
+          relations: ['account'],
+          where: { email: email } 
+        });
+    
+        if (profile) {
+          const user: User = await this._userRepository.findOne({ account: { id: profile.account.id } });
+          user.resetToken = uuidv4();
+          user.resetTokenExpiration = this._generateResetTokenExpiration();
+          this._userRepository.save(user);
+        //  this._emailerService.sendPasswordResetEmail(email, user.resetToken);
+        }
+    
+        return {
+          status: ResponseStatus.SUCCESS,
+          message: `You should receive an email with a reset link shortly!`
+        } as ResponseMessage
+      }
+    
+      public async doesEmailExist(email: string): Promise<boolean> {
+        return this._profileRepository.count({ where: { email: email.trim().toLowerCase() }})
+          .then(count => count > 0);
+      }
+    
+      public async doesUsernameExist(username: string): Promise<boolean> {
+        return this._userRepository.count({ where: { username: username.trim().toLowerCase() }})
+          .then(count => count > 0);
+      }
+    
 
 
       
